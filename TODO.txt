@@ -1,0 +1,6 @@
+1. redesign - done
+2. solve rates problem
+3. erase function - done
+4. regex - done
+5. refactor
+6. selected item function refactor
