@@ -3,7 +3,8 @@ from tkinter import messagebox
 from turtle import width
 import re
 from db_sindikalna import Database
-import datetime
+from datetime import *
+from dateutil.relativedelta import relativedelta
 db_sindikalna = Database('sindikalna.db')
 
 def IzborBrojaRata():
@@ -37,30 +38,44 @@ def regex_check():
     if not re_uplaceno_entry:
         messagebox.showinfo(message="Polje 'Uplaceno pri kupovini' nije popunjeno ili ne sadrzi iskljucivo pozitivne brojeve")
         return False
-    re_datum_prve_rate_entry = re.match(r"^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$", datum_prve_rate_entry.get())
-    if not re_datum_prve_rate_entry:
-        messagebox.showinfo(message="Polje 'Datum prve rate' nije popunjeno ili nije upisano u ispravnom fromatu.Primer 25.6.22")
-        return False
+    # re_datum_prve_rate_entry = re.match(r"^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$", datum_prve_rate_entry.get())
+    # if not re_datum_prve_rate_entry:
+    #     messagebox.showinfo(message="Polje 'Datum prve rate' nije popunjeno ili nije upisano u ispravnom fromatu.Primer 25.6.22")
+    #     return False
     re_broj_rata_entry = re.match("^(1[0-2]|[1-9])$", broj_rata_entry.get())
     if not re_broj_rata_entry:
         messagebox.showinfo(message="Polje 'Broj rata' nije popunjeno ili nije u opsegu 1-12")
         return False
-    if int(broj_rata_entry.get()) * int(float(pojedinacna_rata_entry.get())) != int(ukupan_iznos_entry.get()) - int(uplaceno_entry.get()):
-        messagebox.showinfo(message="Broj rata pomnozen sa iznosom pojedinacnih rata nije jednak ukupnom iznosu za placanje umanjenom za iznos uplacen pri kupovini")
-        return False
+    # if int(broj_rata_entry.get()) * int(float(pojedinacna_rata_entry.get())) != int(ukupan_iznos_entry.get()) - int(uplaceno_entry.get()):
+    #     messagebox.showinfo(message="Broj rata pomnozen sa iznosom pojedinacnih rata nije jednak ukupnom iznosu za placanje umanjenom za iznos uplacen pri kupovini")
+    #     return False
     if int(ukupan_iznos_entry.get()) < int(uplaceno_entry.get()):
         messagebox.showinfo(message="Iznos uplacen pri kupovini ne moze biti veci od ukupnog iznosa")
         return False
     return True
+
 def populate_list():
     parts_list.delete(0, END)
     for row in db_sindikalna.fetch():
         parts_list.insert(END, row)
 
 def populate_list_date():
+    # parts_list.delete(0, END)
+    # d = datetime.now()
+    # for row in db_sindikalna.fetch():
+    #     for i in range(row[6]):
+    #         # if datetime.strptime(row[8], "%Y-%m-%d") >= d.strftime("%Y-%m-%d"):
+    #         r = datetime.strptime(row[8], "%Y-%m-%d")
+    #         if r.date() == datetime.date():
+    #             parts_list.insert(END, row)
+    #             break
+
     parts_list.delete(0, END)
-    for row in db_sindikalna.fetchDate():
-        parts_list.insert(END, row)
+    for row in db_sindikalna.fetch():
+        for i in range(row[6]):
+            first_rate_date = datetime.strptime(row[8], "%Y-%m-%d").date()
+            if first_rate_date + relativedelta(months=i) >= datetime.now().date():
+                parts_list.insert(END, "Sind:"+str(row[1]+"Ime:"+row[2]+"Prezime:"+row[3]+"Ukup:"+str(row[4])+"Upl:"+str(row[5])+"D prve rate:"+str(row[8])+"Br.rata:"+str(row[6])+"iznos svake rate:"+str(row[7])+"r b rate:"+str(i+1)+"sl rata:"+str(first_rate_date + relativedelta(months=i))))
 
     # change color for every row
     for i in range(100):
@@ -77,7 +92,7 @@ def add_item():
         db_sindikalna.insert(sindikat_text.get(), ime_text.get(),
                             prezime_text.get(), ukupan_iznos_text.get(),
                             uplaceno_text.get(),broj_rata_text.get(),
-                            pojedinacna_rata_text.get(),datum_prve_rate_text.get())
+                            pojedinacna_rata_text.get(),datetime.strptime(datum_prve_rate_text.get(), '%Y-%m-%d').date())
         parts_list.delete(0, END)
         parts_list.insert(END, (sindikat_text.get(), ime_text.get(),prezime_text.get(), ukupan_iznos_text.get(), uplaceno_text.get(), broj_rata_text.get(), pojedinacna_rata_text.get(), datum_prve_rate_text.get()))
         clear_text()
@@ -193,7 +208,7 @@ rate_label.grid(row=11, column=0, padx=50)
 iznosi_label = Label(app, text='Iznosi: ', font=('bold', 14))
 iznosi_label.grid(row=11, column=1, padx=50)
 # Parts List (Listbox)
-parts_list = Listbox(app, height=15, width=100, border=0)
+parts_list = Listbox(app, height=15, width=120, border=0)
 parts_list.grid(row=2, column=5, columnspan=6, rowspan=6, pady=(100,0), padx=(0,0))
 # Create scrollbar
 scrollbar = Scrollbar(app, orient='vertical')

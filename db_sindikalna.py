@@ -15,10 +15,14 @@ class Database:
         rows = self.cur.fetchall()
         return rows
 
-    def fetchDate(self):
-        self.cur.execute("SELECT * FROM sindikalci WHERE ime='aca'")
-        row = self.cur.fetchall()
-        return row
+    # def fetchDate(self):
+    #     # self.cur.execute("SELECT * FROM sindikalci WHERE ime in ('Aca','Alex')")
+    #     # self.cur.execute("SELECT * FROM sindikalci WHERE datum_prve_rate in (date(),date('now','+1 day'),date('now','+2 day'),date('now','+3 day')) or date_add(datum_prve_rate, interval 1 month) in (date())")
+    #     self.cur.execute("SELECT * FROM sindikalci WHERE datum_prve_rate in (date(),date('now','+1 day'),date('now','+2 day'),date('now','+3 day'))")
+    #
+    #     # self.cur.execute("SELECT * FROM sindikalci WHERE datum_prve_rate in (SELECT DATE('now'))")
+    #     row = self.cur.fetchall()
+    #     return row
 
     def insert(self, sindikat, ime, prezime, ukupan_iznos, uplaceno, broj_rata,pojedinacna_rata, datum_prve_rate):
         self.cur.execute("INSERT INTO sindikalci VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)",
