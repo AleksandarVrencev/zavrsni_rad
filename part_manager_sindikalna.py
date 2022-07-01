@@ -55,39 +55,35 @@ def regex_check():
     return True
 
 def populate_list():
+    global counter
+    counter = 0
     parts_list.delete(0, END)
     for row in db_sindikalna.fetch():
         parts_list.insert(END, row)
 
-def populate_list_date():
-    # parts_list.delete(0, END)
-    # d = datetime.now()
-    # for row in db_sindikalna.fetch():
-    #     for i in range(row[6]):
-    #         # if datetime.strptime(row[8], "%Y-%m-%d") >= d.strftime("%Y-%m-%d"):
-    #         r = datetime.strptime(row[8], "%Y-%m-%d")
-    #         if r.date() == datetime.date():
-    #             parts_list.insert(END, row)
-    #             break
 
+def populate_list_date():
+    global counter
+    counter = 1
     parts_list.delete(0, END)
     for row in db_sindikalna.fetch():
         for i in range(row[6]):
             first_rate_date = datetime.strptime(row[8], "%Y-%m-%d").date()
             if first_rate_date + relativedelta(months=i) >= datetime.now().date():
-                parts_list.insert(END, "Sind:"+str(row[1]+"Ime:"+row[2]+"Prezime:"+row[3]+"Ukup:"+str(row[4])+"Upl:"+str(row[5])+"D prve rate:"+str(row[8])+"Br.rata:"+str(row[6])+"iznos svake rate:"+str(row[7])+"r b rate:"+str(i+1)+"sl rata:"+str(first_rate_date + relativedelta(months=i))))
-
+                # parts_list.insert(END, "Sind:"+str(row[1]+"Ime:"+row[2]+"Prezime:"+row[3]+"Ukup:"+str(row[4])+"Upl:"+str(row[5])+"D prve rate:"+str(row[8])+"Br.rata:"+str(row[6])+"iznos svake rate:"+str(row[7])+"r b rate:"+str(i+1)+"sl rata:"+str(first_rate_date + relativedelta(months=i))))
+                # parts_list.insert(END, str(row[1])+" "+row[2]+" "+row[3]+" Ukupno: "+str(row[4])+" Uplaceno: "+str(row[5])+" Datum prve rate: "+str(row[8])+" Br.rata: "+str(row[6])+" iznos svake rate: "+str(row[7])+" redni broj rate: "+str(i+1)+" sledeca rata: "+str(first_rate_date + relativedelta(months=i)))
+                naplata = str(row[1])+" "+row[2]+" "+row[3]+" Ukupno: "+str(row[4])+" Uplaceno: "+str(row[5])+" Datum prve rate: "+str(row[8])+" Br.rata: "+str(row[6])+" iznos svake rate: "+str(row[7])+" redni broj rate: "+str(i+1)+" sledeca rata: "+str(first_rate_date + relativedelta(months=i))
+                # naplata_tuple = tuple(naplata)
+                # parts_list.insert(END, naplata_tuple)
+                parts_list.insert(END, naplata)
+                # parts_list.insert(1,row[1])
+                break
     # change color for every row
     for i in range(100):
         if parts_list.get(i):
             parts_list.itemconfig(i,{'fg': 'red'})
 
 def add_item():
-    # if sindikat_text.get() == '' or ime_text.get() == '' or prezime_text.get() == '' or ukupan_iznos_text.get() == '' or broj_rata_text.get() == '' or datum_prve_rate_text.get() == '':
-    #     messagebox.showerror('Niste popunili sva polja!')
-    # if not regex_check():
-    #     messagebox.showerror('Niste popunili sva polja!')
-    #     return
     if regex_check():
         db_sindikalna.insert(sindikat_text.get(), ime_text.get(),
                             prezime_text.get(), ukupan_iznos_text.get(),
@@ -101,8 +97,14 @@ def add_item():
 def select_item(event):
     try:
         global selected_item
+        global counter
+
         index = parts_list.curselection()[0]
-        selected_item = parts_list.get(index)
+        lista = []
+        for row in db_sindikalna.fetch():
+            lista.append(row)
+        # selected_item = parts_list.get(index)
+        selected_item = lista[index+counter]
         sindikat_entry.delete(0, END)
         sindikat_entry.insert(END, selected_item[1])
         ime_entry.delete(0, END)
@@ -113,12 +115,12 @@ def select_item(event):
         ukupan_iznos_entry.insert(END, selected_item[4])
         uplaceno_entry.delete(0, END)
         uplaceno_entry.insert(END, selected_item[5])
-        datum_prve_rate_entry.delete(0, END)
-        datum_prve_rate_entry.insert(END, selected_item[8])
         broj_rata_entry.delete(0, END)
         broj_rata_entry.insert(END, selected_item[6])
         pojedinacna_rata_entry.delete(0, END)
         pojedinacna_rata_entry.insert(END, selected_item[7])
+        datum_prve_rate_entry.delete(0, END)
+        datum_prve_rate_entry.insert(END, selected_item[8])
     except IndexError:
         pass
 
@@ -208,7 +210,7 @@ rate_label.grid(row=11, column=0, padx=50)
 iznosi_label = Label(app, text='Iznosi: ', font=('bold', 14))
 iznosi_label.grid(row=11, column=1, padx=50)
 # Parts List (Listbox)
-parts_list = Listbox(app, height=15, width=120, border=0)
+parts_list = Listbox(app, height=15, width=140, border=0)
 parts_list.grid(row=2, column=5, columnspan=6, rowspan=6, pady=(100,0), padx=(0,0))
 # Create scrollbar
 scrollbar = Scrollbar(app, orient='vertical')
@@ -239,10 +241,11 @@ show_btn = Button(app, text='Svi podaci', width=12, command=populate_list)
 show_btn.grid(row=10, column=10)
 
 app.title('Sindikalna prodaja')
-app.geometry('1200x600')
+app.geometry('1400x600')
 
 # Populate data
 populate_list()
+
 
 # Start program
 app.mainloop()
