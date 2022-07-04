@@ -64,8 +64,8 @@ def populate_list():
         brojac_ime=40
         brojac_prezime=40
         # parts_list.insert(END, "ID:"+str(row[0])+" Sindikat:"+row[1]+" Ime:"+row[2]+" Prezime:"+ str(row[3])+ " Ukupno:"+str(row[4])+" Uplaceno pri kupovini"+str(row[5])+" Br.rata:"+str(row[6])+" Iznos svake rate:"+str(row[7]))
-        # parts_list.insert(END, "ID:  "+str(row[0])+"  Sindikat: "+row[1]+' '*(30-str(row[1]).__len__())+"Ime:"+row[2]+' '*(30-str(row[2]).__len__())+"Prezime:"+ str(row[3])+' '*(30-str(row[3]).__len__()))
-        parts_list.insert(END, "{:>3}{:<5}".format("ID:",str(row[0]))+"{:>12}{:<30}".format("Sindikat: ",row[1])+"{:>5}{:<30}".format("ime",row[2])+ "{:>10}{:<30}".format("Prezime:",str(row[3])))
+        parts_list.insert(END, "ID:  "+str(row[0])+"  Sindikat: "+row[1]+' '*(30-str(row[1]).__len__())+"Ime:"+row[2]+' '*(30-str(row[2]).__len__())+"Prezime:"+ str(row[3])+' '*(30-str(row[3]).__len__()))
+        # parts_list.insert(END, "{:>3}{:<5}".format("ID:",str(row[0]))+"{:>12}{:<30}".format("Sindikat: ",row[1])+"{:>5}{:<30}".format("ime",row[2])+ "{:>10}{:<30}".format("Prezime:",str(row[3])))
 
 def populate_list_date():
     global counter
