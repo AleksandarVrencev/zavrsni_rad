@@ -1,6 +1,4 @@
 import sqlite3
-# podaci
-# id, sindikat, ime, prezime, ukupan iznos, uplaceno, broj rata, pojedinacna rata, datum prve rate
 
 class Database:
     def __init__(self, db_sindikalna):
