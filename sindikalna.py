@@ -305,7 +305,7 @@ search_btn = Button(app, text='Pretraga', width=12, command=populate_list_search
 search_btn.grid(row=10, column=8)
 
 app.title('Sindikalna prodaja')
-app.geometry('1100x500')
+app.geometry( '1100x500' )
 
 # Populate data
 populate_list()
